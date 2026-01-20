@@ -1,1 +1,9 @@
+/*
+ * Settings.gradle:
+ * Gradle 빌드 초기화 단계에서 실행되는 설정 파일입니다.
+ * 프로젝트의 구조를 정의하고, 멀티 모듈 프로젝트인 경우 하위 모듈들을 포함(include)하는 역할을 합니다.
+ */
+
+// 루트 프로젝트의 이름을 지정합니다.
+// 이 이름은 IDE에서 프로젝트를 식별하거나 빌드 결과물(Artifact)의 기본 이름으로 사용됩니다.
 rootProject.name = 'spring-boot-boilerplate'
