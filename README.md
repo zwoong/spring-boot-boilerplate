@@ -67,7 +67,7 @@ src/main/java/com/farukgenc/boilerplate/springboot
 이 프로젝트를 실행하기 위해 다음 환경이 준비되어 있어야 합니다.
 
 *   JDK 21 이상
-*   Maven
+*   Gradle (또는 포함된 Gradle Wrapper 사용)
 *   PostgreSQL
 *   Docker (선택 사항)
 
@@ -83,13 +83,14 @@ src/main/java/com/farukgenc/boilerplate/springboot
 2.  **프로젝트 빌드**
     프로젝트 루트 디렉토리에서 다음 명령어로 의존성을 설치하고 빌드합니다.
     ```bash
-    mvn clean install
+    ./gradlew clean build
     ```
+    (Windows의 경우 `gradlew.bat clean build`)
 
 3.  **애플리케이션 실행**
-    빌드가 완료되면 `target` 디렉토리의 JAR 파일을 실행하거나, IDE에서 바로 실행할 수 있습니다.
+    빌드가 완료되면 `build/libs` 디렉토리의 JAR 파일을 실행하거나, IDE에서 바로 실행할 수 있습니다.
     ```bash
-    java -jar target/spring-boot-boilerplate.jar
+    java -jar build/libs/spring-boot-boilerplate-0.0.1-SNAPSHOT.jar
     ```
 
 ## ⚙️ 설정 및 커스터마이징
