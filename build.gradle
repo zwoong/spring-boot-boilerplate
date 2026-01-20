@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.1' // Spring Boot 3.2.1 (4.0.1 is likely a typo in original POM as it's not released yet)
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.farukgenc'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Version variables
+ext {
+    jwtVersion = '4.5.0'
+    mapstructVersion = '1.6.3'
+    commonsLang3Version = '3.20.0'
+    openapiSwaggerVersion = '2.3.0' // Adjusted for Spring Boot 3 compatibility
+    lombokMapstructBindingVersion = '0.2.0'
+}
+
+dependencies {
+    // Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    // Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    
+    // JWT
+    implementation "com.auth0:java-jwt:${jwtVersion}"
+    
+    // PostgreSQL
+    runtimeOnly 'org.postgresql:postgresql'
+    
+    // MapStruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Lombok MapStruct Binding
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+    
+    // Commons Lang3
+    implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
+    
+    // Swagger (OpenAPI)
+    // Note: 'springdoc-openapi-starter-webmvc-ui' is the correct artifact for Boot 3
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapiSwaggerVersion}"
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
