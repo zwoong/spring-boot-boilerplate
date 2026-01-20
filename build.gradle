@@ -1,80 +1,120 @@
+// Gradle 플러그인 설정
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.2.1' // Spring Boot 3.2.1 (4.0.1 is likely a typo in original POM as it's not released yet)
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java' // Java 플러그인: Java 컴파일 및 빌드 기능 제공
+    id 'org.springframework.boot' version '3.2.1' // Spring Boot 플러그인: Spring Boot 애플리케이션 빌드 및 실행 기능 제공
+    id 'io.spring.dependency-management' version '1.1.4' // Spring 의존성 관리 플러그인: Spring 관련 라이브러리 버전 자동 관리
 }
 
+// 프로젝트 그룹 ID
 group = 'com.farukgenc'
+// 프로젝트 버전 (SNAPSHOT은 개발 중인 버전을 의미)
 version = '0.0.1-SNAPSHOT'
 
+// Java 컴파일 설정
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '21' // 소스 코드 호환성: Java 21 버전으로 컴파일
 }
 
+// Gradle 설정 구성
 configurations {
     compileOnly {
+        // compileOnly 설정이 annotationProcessor 설정을 상속받도록 설정
+        // 이를 통해 컴파일 시에만 필요한 어노테이션 프로세서가 런타임에 포함되지 않음
         extendsFrom annotationProcessor
     }
 }
 
+// 의존성 저장소 설정
 repositories {
-    mavenCentral()
+    mavenCentral() // Maven Central 저장소 사용: 공개 라이브러리 다운로드
 }
 
-// Version variables
+// 라이브러리 버전 변수 정의 (중앙 집중식 버전 관리)
 ext {
-    jwtVersion = '4.5.0'
-    mapstructVersion = '1.6.3'
-    commonsLang3Version = '3.20.0'
-    openapiSwaggerVersion = '2.3.0' // Adjusted for Spring Boot 3 compatibility
-    lombokMapstructBindingVersion = '0.2.0'
+    jwtVersion = '4.5.0' // JWT 토큰 생성 및 검증 라이브러리 버전
+    mapstructVersion = '1.6.3' // MapStruct 매핑 라이브러리 버전 (컴파일 타임 코드 생성)
+    commonsLang3Version = '3.20.0' // Apache Commons Lang3 유틸리티 라이브러리 버전
+    openapiSwaggerVersion = '2.3.0' // SpringDoc OpenAPI 버전 (Spring Boot 3 호환성을 위해 조정됨)
+    lombokMapstructBindingVersion = '0.2.0' // Lombok과 MapStruct 연동을 위한 바인딩 라이브러리 버전
 }
 
+// 프로젝트 의존성 정의
 dependencies {
-    // Web
+    // ========== Spring Boot Starters ==========
+    
+    // 웹 애플리케이션 개발을 위한 스타터 (Spring MVC, 내장 톰캣 서버 포함)
     implementation 'org.springframework.boot:spring-boot-starter-web'
     
-    // Data JPA
+    // 데이터베이스 접근을 위한 JPA 스타터 (Hibernate 포함)
+    // 엔티티 매핑, 리포지토리 패턴 지원
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     
-    // Validation
+    // Bean Validation 스타터 (@NotNull, @Size 등 어노테이션 기반 유효성 검증)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     
-    // Security
+    // Spring Security 스타터 (인증 및 인가 기능 제공)
     implementation 'org.springframework.boot:spring-boot-starter-security'
     
-    // Actuator
+    // Spring Boot Actuator 스타터 (애플리케이션 모니터링 및 관리 엔드포인트 제공)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     
-    // JWT
+    // ========== 인증/보안 라이브러리 ==========
+    
+    // JWT (JSON Web Token) 토큰 생성 및 검증 라이브러리
+    // Auth0에서 제공하는 Java JWT 구현체
     implementation "com.auth0:java-jwt:${jwtVersion}"
     
-    // PostgreSQL
+    // ========== 데이터베이스 드라이버 ==========
+    
+    // PostgreSQL 데이터베이스 JDBC 드라이버
+    // runtimeOnly: 런타임에만 필요하며 컴파일 시에는 불필요
     runtimeOnly 'org.postgresql:postgresql'
     
-    // MapStruct
+    // ========== 매핑 라이브러리 ==========
+    
+    // MapStruct: DTO와 엔티티 간 매핑을 위한 컴파일 타임 코드 생성 라이브러리
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    // MapStruct 어노테이션 프로세서 (컴파일 시 매퍼 구현체 생성)
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     
-    // Lombok
+    // ========== 코드 생성 라이브러리 ==========
+    
+    // Lombok: 보일러플레이트 코드 자동 생성 (getter, setter, builder 등)
+    // compileOnly: 컴파일 시에만 필요, 런타임에는 포함되지 않음
     compileOnly 'org.projectlombok:lombok'
+    // Lombok 어노테이션 프로세서 (컴파일 시 코드 생성)
     annotationProcessor 'org.projectlombok:lombok'
     
-    // Lombok MapStruct Binding
+    // Lombok과 MapStruct를 함께 사용하기 위한 바인딩 라이브러리
+    // 두 라이브러리가 서로 호환되도록 보장
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
     
-    // Commons Lang3
+    // ========== 유틸리티 라이브러리 ==========
+    
+    // Apache Commons Lang3: 문자열, 배열, 날짜 등 다양한 유틸리티 메서드 제공
     implementation "org.apache.commons:commons-lang3:${commonsLang3Version}"
     
-    // Swagger (OpenAPI)
-    // Note: 'springdoc-openapi-starter-webmvc-ui' is the correct artifact for Boot 3
+    // ========== API 문서화 ==========
+    
+    // Swagger/OpenAPI 문서 자동 생성 라이브러리
+    // 참고: 'springdoc-openapi-starter-webmvc-ui'는 Spring Boot 3에 맞는 올바른 아티팩트입니다
+    // /swagger-ui.html 또는 /swagger-ui/index.html에서 API 문서 확인 가능
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapiSwaggerVersion}"
 
-    // Test
+    // ========== 테스트 라이브러리 ==========
+    
+    // Spring Boot 테스트 스타터 (JUnit, Mockito, AssertJ 등 포함)
+    // testImplementation: 테스트 코드에서만 사용, 실제 빌드에는 포함되지 않음
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    // Spring Security 테스트 지원 라이브러리
+    // 보안 컨텍스트를 테스트 환경에서 쉽게 설정할 수 있도록 도와줌
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
+// 테스트 태스크 설정
 tasks.named('test') {
+    // JUnit Platform (JUnit 5) 사용
+    // JUnit Jupiter를 통해 테스트 실행
     useJUnitPlatform()
 }
