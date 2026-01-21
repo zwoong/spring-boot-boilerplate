@@ -4,8 +4,11 @@
 .gradle/
 build/
 # Gradle Wrapper는 커밋해야 하지만, gradle/ 디렉토리 내 다른 파일은 무시
-gradle/
+# 주의: 디렉토리를 무시한 후 예외 처리를 하려면 순서가 중요함
+# gradle/ 디렉토리 전체를 무시하되, wrapper 디렉토리는 예외 처리
+gradle/*
 !gradle/wrapper/
+gradle/wrapper/*
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 
