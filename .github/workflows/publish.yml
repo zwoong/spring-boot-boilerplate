@@ -1,51 +1,130 @@
-name: Build Maven Package And Publish Docker Image
+# 워크플로우 이름 (GitHub Actions UI에서 표시됨)
+name: Build and Publish Docker Image
 
+# 워크플로우 트리거 조건 정의
 on:
-  push:
+  push:                    # Git push 이벤트 발생 시 실행
     branches:
-      - master
+      - master             # master 브랜치에 push될 때만 실행
+    paths-ignore:          # 다음 경로 변경 시 워크플로우 실행 제외 (성능 최적화)
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:       # 수동 실행 가능하도록 설정 (GitHub Actions UI에서 실행 버튼 제공)
 
+# 실행할 작업(Job) 정의
 jobs:
-  build:
+  build:                   # 작업 이름: build
 
+    # 실행 환경: 최신 Ubuntu 버전 사용
     runs-on: ubuntu-latest
 
+    # GitHub Actions 권한 설정
+    # GITHUB_TOKEN은 자동으로 제공되지만, GitHub Container Registry에 푸시하려면 명시적 권한 설정 필요
+    permissions:
+      contents: read        # 저장소 코드 읽기 권한
+      packages: write       # GitHub Container Registry에 패키지 푸시 권한
+
+    # 환경 변수 정의 (워크플로우 전체에서 재사용)
+    env:
+      # GitHub Container Registry 사용 (ghcr.io)
+      # 형식: ghcr.io/GITHUB_USERNAME/IMAGE_NAME
+      # 예: ghcr.io/omerfarukgenc34/spring-boot-boilerplate
+      REGISTRY: ghcr.io  # GitHub Container Registry 사용
+      IMAGE_NAME: ${{ github.repository }}  # 자동으로 GitHub 저장소 이름 사용 (예: omerfarukgenc34/spring-boot-boilerplate)
+
+    # 작업 실행 단계 정의
     steps:
-      - uses: actions/checkout@v4
+      # 1단계: 소스 코드 체크아웃
+      # GitHub 저장소의 코드를 워크플로우 실행 환경으로 가져옴
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1   # 전체 히스토리 대신 최신 커밋만 가져오기 (체크아웃 속도 향상)
+
+      # 2단계: JDK 21 설정
+      # Java 개발 환경 구성 (빌드에 필요)
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'gradle'
+          java-version: '21'           # Java 21 버전 사용
+          distribution: 'temurin'       # Eclipse Temurin JDK 배포판 사용 (OpenJDK 기반)
+          cache: 'gradle'               # Gradle 의존성 캐싱 활성화 (빌드 속도 향상)
 
-      - name: Build with Gradle
-        run: gradle build --no-daemon
+      # 3단계: Gradle 의존성 캐시 복원 (명시적 캐싱)
+      # Gradle 의존성 캐시를 복원하여 빌드 시간 단축
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
+      # 4단계: 프로젝트 버전 추출 (빌드 전에 실행하여 태그 생성에 사용)
+      # build.gradle에서 프로젝트 버전 정보를 추출하여 후속 단계에서 사용할 수 있도록 설정
       - name: Extract Project Version
-        run: echo "version=$(gradle properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_OUTPUT
         id: project
+        run: |
+          VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
 
-      - name: Show Project version
-        run: echo ${{steps.project.outputs.version}}
+      # 5단계: Gradle 빌드 실행
+      # 프로젝트를 빌드하여 JAR 파일 생성
+      # --no-daemon: 백그라운드 데몬 프로세스 없이 실행 (CI 환경에 적합)
+      # --build-cache: Gradle 빌드 캐시 사용 (빌드 속도 향상)
+      - name: Build with Gradle
+        run: gradle build --no-daemon --build-cache -x test
 
+      # 6단계: 빌드 아티팩트 업로드 (선택사항: 디버깅 및 배포용)
+      # 빌드된 JAR 파일을 GitHub Actions 아티팩트로 저장
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-artifact
+          path: build/libs/*.jar
+          retention-days: 7            # 7일간 보관
+
+      # 7단계: QEMU 설정
+      # 멀티 아키텍처 Docker 이미지 빌드를 위한 에뮬레이터 설정
+      # (예: ARM64, AMD64 등 다양한 플랫폼 지원)
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
+      # 8단계: Docker Buildx 설정
+      # Docker의 확장 빌드 기능 활성화 (멀티 플랫폼 빌드, 빌드 캐시 등 고급 기능 사용)
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
-      - name: Build and push docker image
-        uses: docker/build-push-action@v4
+      # 9단계: GitHub Container Registry 로그인
+      # GitHub Container Registry에 이미지를 푸시하기 위해 인증
+      # GITHUB_TOKEN은 자동으로 제공되므로 별도 Secrets 설정 불필요
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          context: .
-          push: true
-          tags: |
-            omerfarukgenc34/spring-boot-boilerplate:${{steps.project.outputs.version}}
-            omerfarukgenc34/spring-boot-boilerplate:latest
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}  # GitHub 사용자명 자동 사용
+          password: ${{ secrets.GITHUB_TOKEN }}  # GitHub Actions에서 자동 제공되는 토큰
+
+      # 10단계: Docker 이미지 빌드 및 푸시
+      # Dockerfile을 사용하여 이미지를 빌드하고 GitHub Container Registry에 푸시
+      # 캐시 최적화: 이전 빌드의 레이어를 재사용하여 빌드 시간 단축
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .                    # 빌드 컨텍스트: 현재 디렉토리 (Dockerfile이 있는 위치)
+          file: ./Dockerfile            # Dockerfile 경로 명시
+          push: true                    # 빌드 후 자동으로 GitHub Container Registry에 푸시
+          tags: |                       # 이미지 태그 목록 (여러 태그 지정 가능)
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{steps.project.outputs.version}}  # 버전 태그 (예: ghcr.io/omerfarukgenc34/spring-boot-boilerplate:0.0.1-SNAPSHOT)
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest                                # 최신 버전 태그
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache  # 레지스트리에서 캐시 가져오기
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max  # 레지스트리에 캐시 저장
+          platforms: linux/amd64        # 플랫폼 지정 (빌드 시간 단축, 필요시 linux/arm64 추가 가능)
