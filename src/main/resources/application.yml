@@ -1,57 +1,123 @@
+# ========== 서버 설정 ==========
 server:
+  # HTTP/2 프로토콜 활성화
+  # HTTP/2는 멀티플렉싱, 헤더 압축 등으로 성능 향상 제공
   http2:
     enabled: true
 
+# ========== Spring 프레임워크 설정 ==========
 spring:
+  # 데이터베이스 연결 설정
   datasource:
+    # PostgreSQL 데이터베이스 연결 URL
+    # 환경 변수 사용: POSTGRES_DB_SERVER_ADDRESS (기본값: localhost)
+    # 환경 변수 사용: POSTGRES_DB_SERVER_PORT (기본값: 5432)
     url: jdbc:postgresql://${POSTGRES_DB_SERVER_ADDRESS:localhost}:${POSTGRES_DB_SERVER_PORT:5432}/
+    # 데이터베이스 사용자명 (환경 변수: POSTGRES_USER, 기본값: postgres)
     username: ${POSTGRES_USER:postgres}
+    # 데이터베이스 비밀번호 (환경 변수: POSTGRES_PASSWORD, 기본값: example)
     password: ${POSTGRES_PASSWORD:example}
+    # HikariCP 연결 풀 설정 (Spring Boot 기본 연결 풀)
     hikari:
+      # 연결 풀 이름 (모니터링 및 디버깅 시 식별 용도)
       pool-name: SpringBootBoilerplateHikariPool
+  
+  # JPA (Java Persistence API) 설정
   jpa:
+    # Hibernate DDL 자동 생성 설정
+    # create: 애플리케이션 시작 시 스키마를 생성하고 종료 시 삭제 (개발 환경용)
+    # validate: 스키마 검증만 수행 (프로덕션 환경 권장)
+    # update: 스키마 변경 시 자동 업데이트 (개발 환경용)
+    # none: DDL 자동 생성 비활성화
     hibernate:
       ddl-auto: create
+    # Open Session In View 패턴 비활성화
+    # false: 트랜잭션 종료 후 지연 로딩 불가 (권장, 성능 향상)
+    # true: HTTP 요청 종료 시까지 세션 유지 (기본값, 비권장)
     open-in-view: false
+  
+  # JTA (Java Transaction API) 설정
   jta:
+    # JTA 트랜잭션 관리 비활성화
+    # 단일 데이터소스 사용 시 불필요 (성능 최적화)
     enabled: false
 
+# ========== SpringDoc OpenAPI 설정 (Swagger UI) ==========
 springdoc:
+  # Actuator 엔드포인트를 Swagger UI에 표시
   show-actuator: true
+  # API 문서 자동 생성 활성화
   api-docs:
     enabled: true
+  # Swagger UI 활성화 (브라우저에서 API 문서 확인 가능)
+  # 접속 URL: http://localhost:8080/swagger-ui.html
   swagger-ui:
     enabled: true
 
+# ========== Spring Boot Actuator 설정 (애플리케이션 모니터링) ==========
 management:
+  # Health Check 엔드포인트 설정
   endpoint:
     health:
+      # Health Check 상세 정보 항상 표시
+      # ALWAYS: 항상 상세 정보 표시
+      # WHEN_AUTHORIZED: 인증된 사용자에게만 표시
+      # NEVER: 상세 정보 숨김
       show-details: ALWAYS
+      # Kubernetes Readiness/Liveness 프로브 활성화
+      # /actuator/health/readiness: 준비 상태 확인
+      # /actuator/health/liveness: 생존 상태 확인
       probes:
         enabled: true
+  # Actuator 엔드포인트 노출 설정
   endpoints:
     web:
+      # 모든 엔드포인트 노출 (개발 환경용)
+      # 프로덕션 환경에서는 필요한 엔드포인트만 선택적으로 노출 권장
+      # 예: include: health,info,metrics
       exposure:
         include: "*"
 
+# ========== 로깅 설정 ==========
 logging:
   level:
+    # Spring Framework 로그 레벨: INFO
+    # DEBUG: 상세한 디버깅 정보
+    # INFO: 일반 정보 (권장)
+    # WARN: 경고 메시지
+    # ERROR: 에러 메시지
     org.springframework: INFO
+    # 애플리케이션 패키지 로그 레벨: INFO
     com.farukgenc.boilerplate.springboot: INFO
 
-## FIXME : Customize JWT token and Swagger information for your application
+# ========== 커스텀 설정 ==========
+## 주의: JWT 토큰 및 Swagger 정보를 애플리케이션에 맞게 커스터마이징하세요
 
+# JWT (JSON Web Token) 설정
 jwt:
+  # JWT 토큰 서명에 사용되는 비밀 키
+  # 프로덕션 환경에서는 반드시 강력한 랜덤 키로 변경 필요 (보안 중요!)
   secretKey: secret
+  # JWT 토큰 발급자 (Issuer)
   issuer: www.farukgenc.com
+  # JWT 토큰 만료 시간 (분 단위)
   expirationMinute: 10
 
+# Swagger API 문서 커스터마이징 설정
 swagger:
+  # 연락처 이름
   contact-name: Faruk Genc
+  # 연락처 이메일
   contact-mail: omer@farukgenc.com
+  # 연락처 웹사이트 URL
   contact-url: https://farukgenc.com
+  # 애플리케이션 이름
   app-name: Spring Boot Boilerplate Project
+  # 애플리케이션 설명
   app-description: "Spring Boot Boilerplate is a starter kit. This project includes : Spring Boot(4.0.1), Spring Data JPA, Spring Validation, Spring Security + JWT Token, PostgreSQL, Mapstruct, Lombok, Swagger (Open API)"
+  # 애플리케이션 버전
   app-version: 4.0.1
+  # 라이선스 URL
   app-license-url: https://www.apache.org/licenses/LICENSE-2.0.html
+  # 라이선스 이름
   app-license: Apache 2.0
