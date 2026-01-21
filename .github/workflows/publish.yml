@@ -1,141 +1,107 @@
 # 워크플로우 이름 (GitHub Actions UI에서 표시됨)
 name: Build and Publish Docker Image
 
-# 워크플로우 트리거 조건 정의
+# 워크플로우 트리거 조건
 on:
-  push:                    # Git push 이벤트 발생 시 실행
+  push:
     branches:
-      - master             # master 브랜치에 push될 때만 실행
-    paths-ignore:          # 다음 경로 변경 시 워크플로우 실행 제외 (성능 최적화)
-      - '**.md'
-      - '.gitignore'
-      - 'LICENSE'
-  workflow_dispatch:       # 수동 실행 가능하도록 설정 (GitHub Actions UI에서 실행 버튼 제공)
+      - master  # master 브랜치에 push될 때만 실행
+    # 성능 최적화: 다음 파일 변경 시 빌드 스킵 (불필요한 빌드 방지)
+    paths-ignore:
+      - '**.md'  # 마크다운 문서 파일
+      - '.gitignore'  # Git 무시 파일
+      - 'LICENSE'  # 라이선스 파일
+  workflow_dispatch:  # GitHub Actions UI에서 수동 실행 가능
 
-# 실행할 작업(Job) 정의
 jobs:
-  build:                   # 작업 이름: build
-
-    # 실행 환경: 최신 Ubuntu 버전 사용
+  build:
+    # 실행 환경: 최신 Ubuntu 버전
     runs-on: ubuntu-latest
-
+    
     # GitHub Actions 권한 설정
-    # GITHUB_TOKEN은 자동으로 제공되지만, GitHub Container Registry에 푸시하려면 명시적 권한 설정 필요
+    # GITHUB_TOKEN은 자동 제공되지만, 명시적 권한 설정 필요
     permissions:
-      contents: read        # 저장소 코드 읽기 권한
-      packages: write       # GitHub Container Registry에 패키지 푸시 권한
-
+      contents: read  # 저장소 코드 읽기 권한
+      packages: write  # GitHub Container Registry에 패키지 푸시 권한
+    
     # 환경 변수 정의 (워크플로우 전체에서 재사용)
     env:
-      # GitHub Container Registry 사용 (ghcr.io)
-      # 형식: ghcr.io/GITHUB_USERNAME/IMAGE_NAME
-      # 예: ghcr.io/omerfarukgenc34/spring-boot-boilerplate
-      REGISTRY: ghcr.io  # GitHub Container Registry 사용
-      IMAGE_NAME: ${{ github.repository }}  # 자동으로 GitHub 저장소 이름 사용 (예: omerfarukgenc34/spring-boot-boilerplate)
-
-    # 작업 실행 단계 정의
+      REGISTRY: ghcr.io  # GitHub Container Registry 도메인
+      # 자동으로 저장소 이름 사용 (예: 사용자명/저장소이름)
+      IMAGE_NAME: ${{ github.repository }}
+    
     steps:
       # 1단계: 소스 코드 체크아웃
       # GitHub 저장소의 코드를 워크플로우 실행 환경으로 가져옴
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1   # 전체 히스토리 대신 최신 커밋만 가져오기 (체크아웃 속도 향상)
-
+      
       # 2단계: JDK 21 설정
       # Java 개발 환경 구성 (빌드에 필요)
-      - name: Set up JDK 21
+      - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'           # Java 21 버전 사용
-          distribution: 'temurin'       # Eclipse Temurin JDK 배포판 사용 (OpenJDK 기반)
-          cache: 'gradle'               # Gradle 의존성 캐싱 활성화 (빌드 속도 향상)
-
-      # 3단계: Gradle 8.5 설치
-      # Dockerfile과 동일한 Gradle 버전 사용 (호환성 보장)
-      # Spring Boot 3.2.1은 Gradle 8.x와 호환됨 (Gradle 9.x는 호환성 문제 발생 가능)
-      - name: Setup Gradle
+          java-version: '21'  # Java 21 버전 사용
+          distribution: 'temurin'  # Eclipse Temurin JDK 배포판 (OpenJDK 기반)
+      
+      # 3단계: Gradle 8.5 설치 및 설정
+      # gradle-build-action은 Gradle 설치, 캐싱, 빌드 최적화를 자동으로 처리
+      - name: Setup Gradle 8.5
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: '8.5'        # Dockerfile에서 사용하는 Gradle 버전과 동일
-
-      # 4단계: Gradle 의존성 캐시 복원 (명시적 캐싱)
-      # Gradle 의존성 캐시를 복원하여 빌드 시간 단축
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      # 5단계: 프로젝트 버전 추출 (빌드 전에 실행하여 태그 생성에 사용)
-      # build.gradle에서 프로젝트 버전 정보를 추출하여 후속 단계에서 사용할 수 있도록 설정
+          # Dockerfile에서 사용하는 Gradle 버전과 동일하게 설정 (호환성 보장)
+          # Spring Boot 3.2.1은 Gradle 8.x와 호환됨
+          gradle-version: '8.5'
+      
+      # 4단계: 프로젝트 버전 추출
+      # build.gradle에서 프로젝트 버전 정보를 추출하여 Docker 이미지 태그에 사용
       - name: Extract Project Version
-        id: project
+        id: project  # 이 단계의 출력을 'project' ID로 참조 가능
         run: |
+          # Gradle properties에서 버전 정보 추출
           VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')
+          # 후속 단계에서 사용할 수 있도록 출력 변수에 저장
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Extracted version: $VERSION"
-
-      # 6단계: Gradle 빌드 실행
+      
+      # 5단계: Gradle 빌드 실행
       # 프로젝트를 빌드하여 JAR 파일 생성
-      # --no-daemon: 백그라운드 데몬 프로세스 없이 실행 (CI 환경에 적합)
-      # --build-cache: Gradle 빌드 캐시 사용 (빌드 속도 향상)
       - name: Build with Gradle
-        run: gradle build --no-daemon --build-cache -x test
-
-      # 7단계: 빌드 아티팩트 업로드 (선택사항: 디버깅 및 배포용)
-      # 빌드된 JAR 파일을 GitHub Actions 아티팩트로 저장
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar-artifact
-          path: build/libs/*.jar
-          retention-days: 7            # 7일간 보관
-
-      # 8단계: QEMU 설정
-      # 멀티 아키텍처 Docker 이미지 빌드를 위한 에뮬레이터 설정
-      # (예: ARM64, AMD64 등 다양한 플랫폼 지원)
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      # 9단계: Docker Buildx 설정
-      # Docker의 확장 빌드 기능 활성화 (멀티 플랫폼 빌드, 빌드 캐시 등 고급 기능 사용)
+        run: gradle build --no-daemon -x test
+        # --no-daemon: 백그라운드 데몬 프로세스 없이 실행 (CI 환경에 적합)
+        # -x test: 테스트 제외 (빌드 시간 단축, 필요시 제거 가능)
+      
+      # 6단계: Docker Buildx 설정
+      # Docker의 확장 빌드 기능 활성화 (멀티 플랫폼 빌드, 빌드 캐시 등)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:latest
-            network=host
-
-      # 10단계: GitHub Container Registry 로그인
-      # GitHub Container Registry에 이미지를 푸시하기 위해 인증
-      # GITHUB_TOKEN은 자동으로 제공되므로 별도 Secrets 설정 불필요
+      
+      # 7단계: GitHub Container Registry 로그인
+      # Docker 이미지를 푸시하기 위해 GitHub Container Registry 인증
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.REGISTRY }}  # ghcr.io
           username: ${{ github.actor }}  # GitHub 사용자명 자동 사용
-          password: ${{ secrets.GITHUB_TOKEN }}  # GitHub Actions에서 자동 제공되는 토큰
-
-      # 11단계: Docker 이미지 빌드 및 푸시
+          # GitHub Actions에서 자동 제공되는 토큰 (별도 설정 불필요)
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 8단계: Docker 이미지 빌드 및 푸시
       # Dockerfile을 사용하여 이미지를 빌드하고 GitHub Container Registry에 푸시
-      # 캐시 최적화: 이전 빌드의 레이어를 재사용하여 빌드 시간 단축
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .                    # 빌드 컨텍스트: 현재 디렉토리 (Dockerfile이 있는 위치)
-          file: ./Dockerfile            # Dockerfile 경로 명시
-          push: true                    # 빌드 후 자동으로 GitHub Container Registry에 푸시
+          context: .  # 빌드 컨텍스트: 현재 디렉토리
+          file: ./Dockerfile  # Dockerfile 경로
+          push: true  # 빌드 후 자동으로 레지스트리에 푸시
           # 이미지 태그 목록 (여러 태그 지정 가능)
-          # 버전 태그: ghcr.io/저장소소유자/이미지이름:버전
-          # 최신 태그: ghcr.io/저장소소유자/이미지이름:latest
           tags: |
+            # 버전 태그: ghcr.io/저장소소유자/이미지이름:버전 (예: 0.0.1-SNAPSHOT)
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{steps.project.outputs.version}}
+            # 최신 버전 태그: ghcr.io/저장소소유자/이미지이름:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache  # 레지스트리에서 캐시 가져오기
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max  # 레지스트리에 캐시 저장
-          platforms: linux/amd64        # 플랫폼 지정 (빌드 시간 단축, 필요시 linux/arm64 추가 가능)
+          # 레지스트리 캐시 설정: 이전 빌드의 레이어를 재사용하여 빌드 시간 단축
+          # cache-from: 레지스트리에서 캐시 가져오기
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          # cache-to: 레지스트리에 캐시 저장 (mode=max: 모든 레이어 캐싱)
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          platforms: linux/amd64  # 빌드 플랫폼 지정 (필요시 linux/arm64 추가 가능)
