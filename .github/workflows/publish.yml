@@ -94,10 +94,10 @@ jobs:
           file: ./Dockerfile  # Dockerfile 경로
           push: true  # 빌드 후 자동으로 레지스트리에 푸시
           # 이미지 태그 목록 (여러 태그 지정 가능)
+          # 버전 태그: ghcr.io/저장소소유자/이미지이름:버전 (예: 0.0.1-SNAPSHOT)
+          # 최신 버전 태그: ghcr.io/저장소소유자/이미지이름:latest
           tags: |
-            # 버전 태그: ghcr.io/저장소소유자/이미지이름:버전 (예: 0.0.1-SNAPSHOT)
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{steps.project.outputs.version}}
-            # 최신 버전 태그: ghcr.io/저장소소유자/이미지이름:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           # 레지스트리 캐시 설정: 이전 빌드의 레이어를 재사용하여 빌드 시간 단축
           # cache-from: 레지스트리에서 캐시 가져오기
