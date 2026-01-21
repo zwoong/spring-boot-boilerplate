@@ -3,6 +3,9 @@
 # Gradle 빌드 시스템 관련 파일/디렉토리
 .gradle/
 build/
+# Gradle Wrapper는 커밋해야 하지만, gradle/ 디렉토리 내 다른 파일은 무시
+gradle/
+!gradle/wrapper/
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 
