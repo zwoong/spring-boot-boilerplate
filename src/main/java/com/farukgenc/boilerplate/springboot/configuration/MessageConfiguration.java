@@ -45,9 +45,7 @@ public class MessageConfiguration {
 		
 		// 메시지 파일의 기본 이름 설정 (확장자와 언어 코드는 자동으로 추가됨)
 		// 예: GeneralMessages.properties, GeneralMessages_ko.properties 등
-		messageSource.setBasename("classpath:/messages//GeneralMessages");
-		System.out.println("GeneralMessages.properties loaded" + ProjectConstants.TURKISH_LOCALE.getLanguage());
-
+		messageSource.setBasename("classpath:/messages/general/GeneralMessages");
 		
 		// 메시지 파일의 기본 인코딩 설정 (UTF-8)
 		messageSource.setDefaultEncoding(ProjectConstants.DEFAULT_ENCODING);
