@@ -18,10 +18,12 @@ services:
       timeout: 5s   # 응답 대기 시간 5초
       retries: 5    # 실패 시 5번 재시도
 
-  # 애플리케이션 서비스 정의 (Spring Boot)
+  # 애플리케이션 서비스 정의 (Spring Boot) - 개발 모드
   app:
-    container_name: app # 컨테이너 이름을 'app'으로 고정
-    build: . # 현재 디렉토리(Dockerfile이 있는 위치)를 기반으로 이미지 빌드
+    container_name: app-dev # 개발 모드 컨테이너 이름
+    build:
+      context: . # 현재 디렉토리(Dockerfile이 있는 위치)를 기반으로 이미지 빌드
+      target: builder # 멀티 스테이지 빌드의 빌드 스테이지 사용 (개발 모드: 소스코드 변경 자동 반영)
     ports:
       - "8080:8080" # 호스트포트:컨테이너포트 매핑 (웹 브라우저 접속용)
     environment:
@@ -30,6 +32,15 @@ services:
       - "POSTGRES_DB_SERVER_PORT=5432"
       - "POSTGRES_USER=postgres"
       - "POSTGRES_PASSWORD=example"
+    volumes:
+      # 소스코드 마운트: 로컬 소스코드 변경 시 컨테이너 내부에도 반영 (개발 중 자동 재시작)
+      - ./src:/app/src:rw
+      # 빌드 결과물 마운트: 빌드된 클래스 파일이 자동으로 반영됨
+      - ./build:/app/build:rw
+      # Gradle 캐시 마운트: 의존성 다운로드 시간 단축 (선택사항)
+      - gradle-cache:/home/gradle/.gradle
+    # 개발 모드: 빌드 스테이지에서 gradlew bootRun 실행 (소스코드 변경 시 자동 재시작)
+    command: ["./gradlew", "bootRun", "--no-daemon"]
     
     # 앱 상태 체크 (Healthcheck)
     # Actuator의 Health Endpoint를 호출하여 앱이 준비되었는지 확인합니다.
@@ -45,3 +56,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+volumes:
+  # Gradle 캐시 볼륨: 의존성 다운로드 시간 단축
+  gradle-cache:

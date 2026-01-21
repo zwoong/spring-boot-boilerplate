@@ -58,6 +58,12 @@ dependencies {
     // Spring Boot Actuator 스타터 (애플리케이션 모니터링 및 관리 엔드포인트 제공)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     
+    // ========== 개발 도구 ==========
+    
+    // Spring Boot DevTools: 개발 중 핫 리로드 및 자동 재시작 기능 제공
+    // 소스코드 변경 시 자동으로 애플리케이션 재시작 (개발 환경에서만 사용)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    
     // ========== 인증/보안 라이브러리 ==========
     
     // JWT (JSON Web Token) 토큰 생성 및 검증 라이브러리
