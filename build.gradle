@@ -8,7 +8,7 @@ plugins {
 // 프로젝트 그룹 ID
 group = 'com.farukgenc'
 // 프로젝트 버전 (SNAPSHOT은 개발 중인 버전을 의미)
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 
 // Java 컴파일 설정
 java {
