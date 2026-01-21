@@ -130,9 +130,12 @@ jobs:
           context: .                    # 빌드 컨텍스트: 현재 디렉토리 (Dockerfile이 있는 위치)
           file: ./Dockerfile            # Dockerfile 경로 명시
           push: true                    # 빌드 후 자동으로 GitHub Container Registry에 푸시
-          tags: |                       # 이미지 태그 목록 (여러 태그 지정 가능)
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{steps.project.outputs.version}}  # 버전 태그 (예: ghcr.io/omerfarukgenc34/spring-boot-boilerplate:0.0.1-SNAPSHOT)
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest                                # 최신 버전 태그
+          # 이미지 태그 목록 (여러 태그 지정 가능)
+          # 버전 태그: ghcr.io/저장소소유자/이미지이름:버전
+          # 최신 태그: ghcr.io/저장소소유자/이미지이름:latest
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{steps.project.outputs.version}}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache  # 레지스트리에서 캐시 가져오기
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max  # 레지스트리에 캐시 저장
           platforms: linux/amd64        # 플랫폼 지정 (빌드 시간 단축, 필요시 linux/arm64 추가 가능)
