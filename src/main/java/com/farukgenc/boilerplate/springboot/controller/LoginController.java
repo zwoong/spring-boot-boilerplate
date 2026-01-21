@@ -1,7 +1,7 @@
 package com.farukgenc.boilerplate.springboot.controller;
 
-import com.farukgenc.boilerplate.springboot.security.dto.LoginRequest;
-import com.farukgenc.boilerplate.springboot.security.dto.LoginResponse;
+import com.farukgenc.boilerplate.springboot.dto.auth.request.LoginRequest;
+import com.farukgenc.boilerplate.springboot.dto.auth.response.LoginResponse;
 import com.farukgenc.boilerplate.springboot.security.jwt.JwtTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
