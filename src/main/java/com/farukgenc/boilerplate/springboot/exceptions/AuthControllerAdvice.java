@@ -1,7 +1,7 @@
 package com.farukgenc.boilerplate.springboot.exceptions;
 
-import com.farukgenc.boilerplate.springboot.controller.LoginController;
-import com.farukgenc.boilerplate.springboot.controller.RegistrationController;
+import com.farukgenc.boilerplate.springboot.controller.auth.LoginController;
+import com.farukgenc.boilerplate.springboot.controller.auth.RegistrationController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

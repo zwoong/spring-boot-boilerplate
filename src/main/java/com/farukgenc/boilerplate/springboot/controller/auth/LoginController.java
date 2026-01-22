@@ -1,4 +1,4 @@
-package com.farukgenc.boilerplate.springboot.controller;
+package com.farukgenc.boilerplate.springboot.controller.auth;
 
 import com.farukgenc.boilerplate.springboot.dto.auth.request.LoginRequest;
 import com.farukgenc.boilerplate.springboot.dto.auth.response.LoginResponse;
