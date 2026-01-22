@@ -232,25 +232,32 @@ Controller → Service → Repository
 
 ### 실행 방법
 
-1.  **데이터베이스 실행**
-    Docker를 사용한다면 손쉽게 DB를 실행할 수 있습니다.
-    ```bash
-    docker compose up -d
-    ```
-    (로컬 환경 설정이 다르다면 `local-docker-compose.yml`을 확인하세요.)
+프로젝트는 Docker Compose를 사용하여 간편하게 실행할 수 있습니다.
 
-2.  **프로젝트 빌드**
-    프로젝트 루트 디렉토리에서 다음 명령어로 의존성을 설치하고 빌드합니다.
-    ```bash
-    ./gradlew clean build
-    ```
-    (Windows의 경우 `gradlew.bat clean build`)
+**서버 시작 (개발 모드)**
+```bash
+./run.sh
+```
 
-3.  **애플리케이션 실행**
-    빌드가 완료되면 `build/libs` 디렉토리의 JAR 파일을 실행하거나, IDE에서 바로 실행할 수 있습니다.
-    ```bash
-    java -jar build/libs/spring-boot-boilerplate-0.0.2-SNAPSHOT.jar
-    ```
+이 명령어는 다음을 수행합니다:
+- PostgreSQL 데이터베이스 컨테이너 시작
+- Spring Boot 애플리케이션 컨테이너 빌드 및 시작
+- 개발 모드로 실행 (소스코드 변경 시 자동 재시작)
+
+**서버 중지**
+```bash
+docker compose down
+```
+
+**로그 확인**
+```bash
+docker compose logs -f
+```
+
+**서비스 상태 확인**
+```bash
+docker compose ps
+```
 
 ## ⚙️ 설정 및 커스터마이징
 
@@ -265,10 +272,6 @@ Controller → Service → Repository
 
 애플리케이션 실행 후, 아래 주소에서 API 문서를 확인할 수 있습니다.
 *   [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) (기본 포트 사용 시)
-
-## 🔗 참고 리소스
-
-*   **Postman 컬렉션**: [Postman Collection 바로가기](https://www.postman.com/postmanfaruk/workspace/faruk-genc-projects/collection/11439300-3d0317df-f217-40ff-a2a6-4eaaf66e1c55?action=share&creator=11439300) - API 테스트를 위한 컬렉션을 제공합니다.
 
 ## 📄 라이선스
 
