@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 사용자 서비스 구현체
@@ -51,9 +52,10 @@ public class UserServiceImpl implements UserService {
 	 * @return 사용자 엔티티 (없으면 null)
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public User findByUsername(String username) {
 
-		return userRepository.findByUsername(username);
+		return userRepository.findByUsername(username).orElse(null);
 	}
 
 	/**
@@ -64,13 +66,20 @@ public class UserServiceImpl implements UserService {
 	 * @throws RegistrationException 사용자명 또는 이메일이 이미 존재하는 경우
 	 */
 	@Override
+	@Transactional
 	public RegistrationResponse registration(RegistrationRequest registrationRequest) {
 
 		userValidationService.validateUser(registrationRequest);
 
-		final User user = UserMapper.INSTANCE.convertToUser(registrationRequest);
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		user.setUserRole(UserRole.USER);
+		final String encodedPassword = bCryptPasswordEncoder.encode(registrationRequest.getPassword());
+		
+		final User user = User.builder()
+				.name(registrationRequest.getName())
+				.username(registrationRequest.getUsername())
+				.password(encodedPassword)
+				.email(registrationRequest.getEmail())
+				.userRole(UserRole.USER)
+				.build();
 
 		userRepository.save(user);
 
@@ -89,6 +98,7 @@ public class UserServiceImpl implements UserService {
 	 * @return 인증된 사용자 DTO (없으면 null)
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public AuthenticatedUserDto findAuthenticatedUserByUsername(String username) {
 
 		final User user = findByUsername(username);

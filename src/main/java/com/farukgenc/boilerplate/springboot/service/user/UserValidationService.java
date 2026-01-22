@@ -7,6 +7,7 @@ import com.farukgenc.boilerplate.springboot.dto.auth.request.RegistrationRequest
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 사용자 유효성 검증 서비스
@@ -47,6 +48,7 @@ public class UserValidationService {
 	 * @param registrationRequest 검증할 회원가입 요청 정보
 	 * @throws RegistrationException 사용자명 또는 이메일이 이미 존재하는 경우
 	 */
+	@Transactional(readOnly = true)
 	public void validateUser(RegistrationRequest registrationRequest) {
 
 		final String email = registrationRequest.getEmail();

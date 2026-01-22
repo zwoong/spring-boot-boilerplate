@@ -8,10 +8,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * 사용자 엔티티
@@ -19,14 +20,21 @@ import lombok.Setter;
  * <p>시스템 사용자 정보를 나타내는 JPA 엔티티입니다.
  * USERS 테이블과 매핑됩니다.
  * 
+ * <p>실무 권장 스타일:
+ * <ul>
+ *   <li>@Builder: 가독성 좋은 객체 생성</li>
+ *   <li>@NoArgsConstructor(access = PROTECTED): JPA 요구사항 충족 및 보안 강화</li>
+ *   <li>@Getter만 사용: 무분별한 setter 사용 방지</li>
+ * </ul>
+ * 
  * @author Faruk
  * @since 2020년 8월
  */
 @Getter
-@Setter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 @Table(name = "USERS")
 public class User {
 

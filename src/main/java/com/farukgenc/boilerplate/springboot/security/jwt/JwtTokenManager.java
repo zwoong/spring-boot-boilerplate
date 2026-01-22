@@ -69,11 +69,25 @@ public class JwtTokenManager {
 	 */
 	public boolean validateToken(String token, String authenticatedUsername) {
 
-		final String usernameFromToken = getUsernameFromToken(token);
-		final boolean equalsUsername = usernameFromToken.equals(authenticatedUsername);
-		final boolean tokenExpired = isTokenExpired(token);
+		if (token == null || authenticatedUsername == null) {
+			return false;
+		}
 
-		return equalsUsername && !tokenExpired;
+		try {
+			final String usernameFromToken = getUsernameFromToken(token);
+			
+			if (usernameFromToken == null) {
+				return false;
+			}
+			
+			final boolean equalsUsername = usernameFromToken.equals(authenticatedUsername);
+			final boolean tokenExpired = isTokenExpired(token);
+
+			return equalsUsername && !tokenExpired;
+		}
+		catch (Exception e) {
+			return false;
+		}
 	}
 
 	/**

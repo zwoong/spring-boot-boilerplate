@@ -3,6 +3,8 @@ package com.farukgenc.boilerplate.springboot.repository.user;
 import com.farukgenc.boilerplate.springboot.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 /**
  * 사용자 데이터 접근 리포지토리
  * 
@@ -33,9 +35,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	 * <pre>SELECT u FROM User u WHERE u.username = ?1</pre>
 	 * 
 	 * @param username 조회할 사용자명
-	 * @return 사용자 엔티티 (없으면 null)
+	 * @return 사용자 엔티티를 포함한 Optional (없으면 Optional.empty())
 	 */
-	User findByUsername(String username);
+	Optional<User> findByUsername(String username);
 
 	/**
 	 * 이메일 존재 여부 확인

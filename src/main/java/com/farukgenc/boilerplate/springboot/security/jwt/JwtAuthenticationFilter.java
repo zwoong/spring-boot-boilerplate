@@ -68,19 +68,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		final UserDetails user = userDetailsService.loadUserByUsername(username);
-		final boolean validToken = jwtTokenManager.validateToken(authToken, user.getUsername());
+		try {
+			final UserDetails user = userDetailsService.loadUserByUsername(username);
+			final boolean validToken = jwtTokenManager.validateToken(authToken, user.getUsername());
 
-		if (!validToken) {
+			if (!validToken) {
+				chain.doFilter(request, response);
+				return;
+			}
+
+			final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+			authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			securityContext.setAuthentication(authentication);
+
+			log.info("Authentication successful. Logged in username : {} ", username);
+		}
+		catch (Exception e) {
+			log.error("Failed to load user or validate token for username: {}", username, e);
 			chain.doFilter(request, response);
 			return;
 		}
-
-		final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-		securityContext.setAuthentication(authentication);
-
-		log.info("Authentication successful. Logged in username : {} ", username);
 
 		chain.doFilter(request, response);
 	}
