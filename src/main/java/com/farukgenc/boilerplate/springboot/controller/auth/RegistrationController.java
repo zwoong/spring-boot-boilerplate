@@ -32,7 +32,7 @@ public class RegistrationController {
 	 * @return 회원가입 응답 (HTTP 201 Created)
 	 */
 	@PostMapping
-	@Operation(tags = "회원가입 서비스", description = "적절한 형식의 정보를 전송하여 시스템에 회원가입할 수 있습니다.")
+	@Operation(tags = "Registration Service", description = "적절한 형식의 정보를 전송하여 시스템에 회원가입할 수 있습니다.")
 	public ResponseEntity<RegistrationResponse> registrationRequest(@Valid @RequestBody RegistrationRequest registrationRequest) {
 
 		final RegistrationResponse registrationResponse = userService.registration(registrationRequest);

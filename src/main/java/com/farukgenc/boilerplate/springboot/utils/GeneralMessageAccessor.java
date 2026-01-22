@@ -2,16 +2,16 @@ package com.farukgenc.boilerplate.springboot.utils;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * 일반 메시지 접근 유틸리티
  * 
  * <p>일반 메시지(GeneralMessages)를 가져오는 서비스입니다.
- * 다국어 메시지 파일에서 메시지를 조회하며, 로케일이 지정되지 않으면 기본값(터키어)을 사용합니다.
+ * HTTP 요청의 Accept-Language 헤더를 기반으로 로케일을 자동으로 결정합니다.
  * 
  * @author Faruk
  * @since 2020년 8월
@@ -28,16 +28,30 @@ public class GeneralMessageAccessor {
 	/**
 	 * 일반 메시지 조회
 	 * 
-	 * @param locale 로케일 (null이면 기본값 사용)
+	 * <p>HTTP 요청의 Accept-Language 헤더를 기반으로 로케일을 자동으로 결정합니다.
+	 * 헤더가 없거나 지원하지 않는 언어인 경우 기본 로케일(한국어)을 사용합니다.
+	 * 
+	 * @param key 메시지 키
+	 * @param parameter 메시지 파라미터
+	 * @return 메시지 문자열
+	 */
+	public String getMessage(String key, Object... parameter) {
+
+		final Locale locale = LocaleContextHolder.getLocale();
+		return messageSource.getMessage(key, parameter, locale);
+	}
+
+	/**
+	 * 일반 메시지 조회 (로케일 명시)
+	 * 
+	 * <p>특정 로케일을 명시적으로 지정하여 메시지를 조회합니다.
+	 * 
+	 * @param locale 로케일
 	 * @param key 메시지 키
 	 * @param parameter 메시지 파라미터
 	 * @return 메시지 문자열
 	 */
 	public String getMessage(Locale locale, String key, Object... parameter) {
-
-		if (Objects.isNull(locale)) {
-			return messageSource.getMessage(key, parameter, ProjectConstants.TURKISH_LOCALE);
-		}
 
 		return messageSource.getMessage(key, parameter, locale);
 	}

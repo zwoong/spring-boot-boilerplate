@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 
 		final String username = registrationRequest.getUsername();
-		final String registrationSuccessMessage = generalMessageAccessor.getMessage(null, REGISTRATION_SUCCESSFUL, username);
+		final String registrationSuccessMessage = generalMessageAccessor.getMessage(REGISTRATION_SUCCESSFUL, username);
 
 		log.info("{} registered successfully!", username);
 

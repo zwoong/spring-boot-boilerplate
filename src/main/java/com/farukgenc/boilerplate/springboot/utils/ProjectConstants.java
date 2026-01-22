@@ -16,6 +16,9 @@ public final class ProjectConstants {
 	/** 기본 문자 인코딩 (UTF-8) */
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
+	/** 한국어 로케일 */
+	public static final Locale KOREAN_LOCALE = new Locale.Builder().setLanguage("ko").setRegion("KR").build();
+
 	/** 터키어 로케일 */
 	public static final Locale TURKISH_LOCALE = new Locale.Builder().setLanguage("tr").setRegion("TR").build();
 

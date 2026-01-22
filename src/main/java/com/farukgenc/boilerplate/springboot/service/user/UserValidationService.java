@@ -72,7 +72,7 @@ public class UserValidationService {
 
 			log.warn("Username: {} already being used!", username);
 
-			final String existsUsername = exceptionMessageAccessor.getMessage(null, USERNAME_ALREADY_EXISTS);
+			final String existsUsername = exceptionMessageAccessor.getMessage(USERNAME_ALREADY_EXISTS);
 			throw new RegistrationException(existsUsername);
 		}
 
@@ -92,7 +92,7 @@ public class UserValidationService {
 
 			log.warn("Email: {} already being used!", email);
 
-			final String existsEmail = exceptionMessageAccessor.getMessage(null, EMAIL_ALREADY_EXISTS);
+			final String existsEmail = exceptionMessageAccessor.getMessage(EMAIL_ALREADY_EXISTS);
 			throw new RegistrationException(existsEmail);
 		}
 	}
