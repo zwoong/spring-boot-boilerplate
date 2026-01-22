@@ -1,4 +1,4 @@
-package com.farukgenc.boilerplate.springboot.security.service;
+package com.farukgenc.boilerplate.springboot.service.user;
 
 import com.farukgenc.boilerplate.springboot.model.User;
 import com.farukgenc.boilerplate.springboot.dto.auth.request.RegistrationRequest;

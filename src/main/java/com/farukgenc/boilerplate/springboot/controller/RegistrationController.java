@@ -2,7 +2,7 @@ package com.farukgenc.boilerplate.springboot.controller;
 
 import com.farukgenc.boilerplate.springboot.dto.auth.request.RegistrationRequest;
 import com.farukgenc.boilerplate.springboot.dto.auth.response.RegistrationResponse;
-import com.farukgenc.boilerplate.springboot.security.service.UserService;
+import com.farukgenc.boilerplate.springboot.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * 회원가입 컨트롤러
  * 
  * <p>사용자 회원가입을 처리하는 REST API 엔드포인트를 제공합니다.
- * 
+ *
  * @author Faruk
  * @since 2020년 8월
  */

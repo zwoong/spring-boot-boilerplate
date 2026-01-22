@@ -1,7 +1,7 @@
 package com.farukgenc.boilerplate.springboot.security.jwt;
 
 import com.farukgenc.boilerplate.springboot.mapper.UserMapper;
-import com.farukgenc.boilerplate.springboot.security.service.UserService;
+import com.farukgenc.boilerplate.springboot.service.user.UserService;
 import com.farukgenc.boilerplate.springboot.model.User;
 import com.farukgenc.boilerplate.springboot.dto.auth.request.LoginRequest;
 import com.farukgenc.boilerplate.springboot.dto.auth.response.LoginResponse;

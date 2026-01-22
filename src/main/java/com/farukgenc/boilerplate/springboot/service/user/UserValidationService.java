@@ -1,4 +1,4 @@
-package com.farukgenc.boilerplate.springboot.service;
+package com.farukgenc.boilerplate.springboot.service.user;
 
 import com.farukgenc.boilerplate.springboot.utils.ExceptionMessageAccessor;
 import com.farukgenc.boilerplate.springboot.exceptions.RegistrationException;
