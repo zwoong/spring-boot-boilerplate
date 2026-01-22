@@ -28,18 +28,14 @@ public class RegistrationController {
 	/**
 	 * 회원가입 요청 처리
 	 * 
-	 * <p>새로운 사용자를 시스템에 등록합니다.
-	 * 요청 데이터는 유효성 검증을 거친 후 처리됩니다.
-	 * 
-	 * @param registrationRequest 회원가입 요청 정보 (이름, 이메일, 사용자명, 비밀번호)
-	 * @return 회원가입 응답 (생성된 사용자 정보)
+	 * @param registrationRequest 회원가입 요청 정보
+	 * @return 회원가입 응답 (HTTP 201 Created)
 	 */
 	@PostMapping
-	@Operation(tags = "Registration Service", description = "적절한 형식의 정보를 전송하여 시스템에 회원가입할 수 있습니다.")
+	@Operation(tags = "회원가입 서비스", description = "적절한 형식의 정보를 전송하여 시스템에 회원가입할 수 있습니다.")
 	public ResponseEntity<RegistrationResponse> registrationRequest(@Valid @RequestBody RegistrationRequest registrationRequest) {
-		// 회원가입 처리
+
 		final RegistrationResponse registrationResponse = userService.registration(registrationRequest);
-		// HTTP 201 Created 상태 코드와 함께 응답 반환
 		return ResponseEntity.status(HttpStatus.CREATED).body(registrationResponse);
 	}
 

@@ -13,9 +13,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 /**
- * Created on Ağustos, 2020
- *
+ * JWT 토큰 서비스
+ * 
+ * <p>로그인 요청을 처리하고 JWT 토큰을 생성하는 서비스입니다.
+ * Spring Security의 AuthenticationManager를 사용하여 사용자 인증을 수행합니다.
+ * 
  * @author Faruk
+ * @since 2020년 8월
  */
 @Slf4j
 @Service
@@ -23,11 +27,17 @@ import org.springframework.stereotype.Service;
 public class JwtTokenService {
 
 	private final UserService userService;
-
 	private final JwtTokenManager jwtTokenManager;
-
 	private final AuthenticationManager authenticationManager;
 
+	/**
+	 * 로그인 응답 생성
+	 * 
+	 * <p>사용자 인증 후 JWT 토큰을 생성하여 반환합니다.
+	 * 
+	 * @param loginRequest 로그인 요청 정보
+	 * @return 로그인 응답 (JWT 토큰 포함)
+	 */
 	public LoginResponse getLoginResponse(LoginRequest loginRequest) {
 
 		final String username = loginRequest.getUsername();

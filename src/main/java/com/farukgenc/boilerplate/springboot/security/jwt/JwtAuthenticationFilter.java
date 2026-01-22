@@ -21,9 +21,13 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Created on Ağustos, 2020
- *
+ * JWT 인증 필터
+ * 
+ * <p>HTTP 요청의 Authorization 헤더에서 JWT 토큰을 추출하고 검증합니다.
+ * 유효한 토큰이면 SecurityContext에 인증 정보를 설정합니다.
+ * 
  * @author Faruk
+ * @since 2020년 8월
  */
 @Slf4j
 @Service
@@ -31,7 +35,6 @@ import java.util.Objects;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenManager jwtTokenManager;
-
 	private final UserDetailsServiceImpl userDetailsService;
 
 	@Override

@@ -13,14 +13,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Created on Ağustos, 2020
- *
+ * 유효성 검증 예외 처리 ControllerAdvice
+ * 
+ * <p>Bean Validation 실패 시 발생하는 예외를 처리합니다.
+ * 모든 컨트롤러에서 발생하는 유효성 검증 에러를 일관된 형식으로 반환합니다.
+ * 
  * @author Faruk
+ * @since 2020년 8월
  */
 @Slf4j
 @RestControllerAdvice
 public class ValidationAdvice {
 
+	/**
+	 * 유효성 검증 예외 처리
+	 * 
+	 * <p>@Valid 어노테이션으로 검증된 요청 데이터가 유효하지 않을 때 발생하는 예외를 처리합니다.
+	 * 
+	 * @param exception 발생한 MethodArgumentNotValidException
+	 * @return HTTP 400 Bad Request 응답
+	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public final ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
 

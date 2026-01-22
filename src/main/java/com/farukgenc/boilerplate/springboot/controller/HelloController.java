@@ -21,16 +21,9 @@ public class HelloController {
 	 * Hello 메시지 반환
 	 * 
 	 * <p>인증된 사용자에게 간단한 인사 메시지를 반환합니다.
-	 * 이 엔드포인트는 JWT 토큰 인증이 필요하므로, 유효한 토큰을 헤더에 포함해야 합니다.
+	 * JWT 토큰 인증이 필요합니다.
 	 * 
-	 * <p>사용 사례:
-	 * <ul>
-	 *   <li>애플리케이션 상태 확인</li>
-	 *   <li>JWT 토큰 유효성 검증</li>
-	 *   <li>인증된 사용자 접근 테스트</li>
-	 * </ul>
-	 * 
-	 * @return HTTP 200 OK와 함께 "Hello Spring Boot Boilerplate" 메시지 반환
+	 * @return HTTP 200 OK와 함께 "Hello Spring Boot Boilerplate" 메시지
 	 */
 	@GetMapping("/hello")
 	@Operation(tags = "Hello Service", description = "헤더에 토큰 정보를 전송하면 Hello 메시지를 반환합니다.")
