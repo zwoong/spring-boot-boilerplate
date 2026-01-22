@@ -1,4 +1,4 @@
-package com.farukgenc.boilerplate.springboot.mapper;
+package com.farukgenc.boilerplate.springboot.mapper.user;
 
 import com.farukgenc.boilerplate.springboot.model.user.User;
 import com.farukgenc.boilerplate.springboot.dto.auth.request.RegistrationRequest;
