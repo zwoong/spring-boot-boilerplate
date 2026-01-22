@@ -1,6 +1,6 @@
 package com.farukgenc.boilerplate.springboot.repository;
 
-import com.farukgenc.boilerplate.springboot.model.User;
+import com.farukgenc.boilerplate.springboot.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

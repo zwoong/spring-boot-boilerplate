@@ -1,7 +1,7 @@
 package com.farukgenc.boilerplate.springboot.service.user;
 
-import com.farukgenc.boilerplate.springboot.model.User;
-import com.farukgenc.boilerplate.springboot.model.UserRole;
+import com.farukgenc.boilerplate.springboot.model.user.User;
+import com.farukgenc.boilerplate.springboot.model.user.UserRole;
 import com.farukgenc.boilerplate.springboot.repository.UserRepository;
 import com.farukgenc.boilerplate.springboot.dto.auth.request.RegistrationRequest;
 import com.farukgenc.boilerplate.springboot.dto.auth.response.RegistrationResponse;

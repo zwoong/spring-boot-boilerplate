@@ -1,6 +1,6 @@
 package com.farukgenc.boilerplate.springboot.dto.user;
 
-import com.farukgenc.boilerplate.springboot.model.UserRole;
+import com.farukgenc.boilerplate.springboot.model.user.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

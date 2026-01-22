@@ -1,4 +1,4 @@
-package com.farukgenc.boilerplate.springboot.model;
+package com.farukgenc.boilerplate.springboot.model.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

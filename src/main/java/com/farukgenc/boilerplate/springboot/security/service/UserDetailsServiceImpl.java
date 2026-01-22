@@ -1,6 +1,6 @@
 package com.farukgenc.boilerplate.springboot.security.service;
 
-import com.farukgenc.boilerplate.springboot.model.UserRole;
+import com.farukgenc.boilerplate.springboot.model.user.UserRole;
 import com.farukgenc.boilerplate.springboot.dto.user.AuthenticatedUserDto;
 import com.farukgenc.boilerplate.springboot.service.user.UserService;
 import lombok.RequiredArgsConstructor;
